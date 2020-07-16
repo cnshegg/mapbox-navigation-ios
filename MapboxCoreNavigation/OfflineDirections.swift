@@ -108,14 +108,36 @@ public class NavigationDirections: Directions {
      */
     public func configureRouter(tilesURL: URL, completionHandler: @escaping NavigationDirectionsCompletionHandler) {
         NavigationDirectionsConstants.offlineSerialQueue.sync {
-            let params = RouterParams(tilesPath: tilesURL.path, inMemoryTileCache: nil, mapMatchingSpatialCache: nil, threadsCount: nil, endpointConfig: nil)
-            self.navigator.configureRouter(for: params)
+
+            let tilesVersionGroup = DispatchGroup()
+            tilesVersionGroup.enter()
+            
+            let tilesVersion = RouteTilesVersion(with: credentials)
+            tilesVersion.getAvailableVersions { availableVersions in
+                if let latestVersion = availableVersions.last {
+                    tilesVersion.currentVersion =  latestVersion
+                    self.navigator.clearCache()
+                }
+                tilesVersionGroup.leave()
+            }
+
+            tilesVersionGroup.wait()
+
+            let skuTokenProvider = SkuTokenProvider(with: credentials)
+            let tileEndpointConfig = TileEndpointConfiguration(host: credentials.host.absoluteString,
+                                                               version: tilesVersion.currentVersion,
+                                                               token: credentials.accessToken ?? "",
+                                                               userAgent: "",
+                                                               navigatorVersion: "",
+                                                               skuTokenSource: skuTokenProvider)
+            let params = RouterParams(tilesPath: tilesURL.path, inMemoryTileCache: nil, mapMatchingSpatialCache: nil, threadsCount: nil, endpointConfig: tileEndpointConfig)
+            let tileCount = self.navigator.configureRouter(for: params)
             DispatchQueue.main.async {
                 completionHandler(tilesURL)
             }
         }
     }
-    
+
     
     /**
      Unpacks a .tar-file at the given filePathURL to a writeable output directory.
