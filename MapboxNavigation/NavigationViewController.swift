@@ -155,7 +155,7 @@ open class NavigationViewController: UIViewController, NavigationStatusPresenter
         }
     }
     
-    var mapViewController: RouteMapViewController?
+    var mapViewController: RouteMapViewController_v2?
     
     var topViewController: ContainerViewController?
     
@@ -238,7 +238,7 @@ open class NavigationViewController: UIViewController, NavigationStatusPresenter
             topViewController = defaultBanner
         }
         
-        let mapViewController = RouteMapViewController(navigationService: self.navigationService, delegate: self, topBanner: topViewController!, bottomBanner: bottomBanner)
+        let mapViewController = RouteMapViewController_v2(navigationService: self.navigationService, delegate: self, topBanner: topViewController!, bottomBanner: bottomBanner)
         
         self.mapViewController = mapViewController
         mapViewController.destination = route.legs.last?.destination
@@ -429,7 +429,7 @@ extension NavigationViewController: RouteMapViewControllerDelegate {
     }
     
     //Still Kept around for the EORVC. On it's way out.
-    func mapViewControllerDidDismiss(_ mapViewController: RouteMapViewController, byCanceling canceled: Bool) {
+    func mapViewControllerDidDismiss(_ mapViewController: RouteMapViewController_v2, byCanceling canceled: Bool) {
         if delegate?.navigationViewControllerDidDismiss(self, byCanceling: canceled) != nil {
             // The receiver should handle dismissal of the NavigationViewController
         } else {
@@ -441,11 +441,11 @@ extension NavigationViewController: RouteMapViewControllerDelegate {
         return delegate?.navigationViewController(self, mapViewUserAnchorPoint: mapView) ?? .zero
     }
     
-    func mapViewControllerShouldAnnotateSpokenInstructions(_ routeMapViewController: RouteMapViewController) -> Bool {
+    func mapViewControllerShouldAnnotateSpokenInstructions(_ routeMapViewController: RouteMapViewController_v2) -> Bool {
         return annotatesSpokenInstructions
     }
     
-    func mapViewController(_ mapViewController: RouteMapViewController, roadNameAt location: CLLocation) -> String? {
+    func mapViewController(_ mapViewController: RouteMapViewController_v2, roadNameAt location: CLLocation) -> String? {
         guard let roadName = delegate?.navigationViewController(self, roadNameAt: location) else {
             return nil
         }
@@ -456,7 +456,7 @@ extension NavigationViewController: RouteMapViewControllerDelegate {
         return delegate?.label(label, willPresent: instruction, as: presented)
     }
     
-    func mapViewController(_ mapViewController: RouteMapViewController, didCenterOn location: CLLocation) {
+    func mapViewController(_ mapViewController: RouteMapViewController_v2, didCenterOn location: CLLocation) {
         navigationComponents.compactMap({$0 as? NavigationMapInteractionObserver}).forEach {
             $0.navigationViewController(didCenterOn: location)
         }

@@ -8,7 +8,7 @@ import Turf
 class ArrowFillPolyline: MGLPolylineFeature {}
 class ArrowStrokePolyline: ArrowFillPolyline {}
 
-class RouteMapViewController: UIViewController {
+class RouteMapViewController_v2: UIViewController {
     var navigationView: NavigationView { return view as! NavigationView }
     var mapView: NavigationMapView { return navigationView.mapView }
     var reportButton: FloatingButton { return navigationView.reportButton }
@@ -22,10 +22,10 @@ class RouteMapViewController: UIViewController {
     }()
 
     private struct Actions {
-        static let overview: Selector = #selector(RouteMapViewController.toggleOverview(_:))
-        static let mute: Selector = #selector(RouteMapViewController.toggleMute(_:))
-        static let feedback: Selector = #selector(RouteMapViewController.feedback(_:))
-        static let recenter: Selector = #selector(RouteMapViewController.recenter(_:))
+        static let overview: Selector = #selector(RouteMapViewController_v2.toggleOverview(_:))
+        static let mute: Selector = #selector(RouteMapViewController_v2.toggleMute(_:))
+        static let feedback: Selector = #selector(RouteMapViewController_v2.feedback(_:))
+        static let recenter: Selector = #selector(RouteMapViewController_v2.recenter(_:))
     }
 
     var route: Route { return navService.router.route }
@@ -204,7 +204,7 @@ class RouteMapViewController: UIViewController {
         unsubscribeFromKeyboardNotifications()
     }
 
-    func embed(_ child: UIViewController, in container: UIView, constrainedBy constraints: ((RouteMapViewController, UIViewController) -> [NSLayoutConstraint])?) {
+    func embed(_ child: UIViewController, in container: UIView, constrainedBy constraints: ((RouteMapViewController_v2, UIViewController) -> [NSLayoutConstraint])?) {
         child.willMove(toParent: self)
         addChild(child)
         container.addSubview(child.view)
@@ -452,7 +452,7 @@ class RouteMapViewController: UIViewController {
 }
 
 // MARK: - NavigationComponent
-extension RouteMapViewController: NavigationComponent {
+extension RouteMapViewController_v2: NavigationComponent {
     func navigationService(_ service: NavigationService, didUpdate progress: RouteProgress, with location: CLLocation, rawLocation: CLLocation) {
         let route = progress.route
         let legIndex = progress.legIndex
@@ -514,7 +514,7 @@ extension RouteMapViewController: NavigationComponent {
 
 // MARK: - UIContentContainer
 
-extension RouteMapViewController {
+extension RouteMapViewController_v2 {
     override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         navigationView.endOfRouteHeightConstraint?.constant = container.preferredContentSize.height
 
@@ -524,7 +524,7 @@ extension RouteMapViewController {
 
 // MARK: - NavigationViewDelegate
 
-extension RouteMapViewController: NavigationViewDelegate {
+extension RouteMapViewController_v2: NavigationViewDelegate {
     // MARK: NavigationViewDelegate
     func navigationView(_ view: NavigationView, didTapCancelButton: CancelButton) {
         delegate?.mapViewControllerDidDismiss(self, byCanceling: true)
@@ -805,10 +805,10 @@ extension RouteMapViewController: NavigationViewDelegate {
 
 // MARK: - Keyboard Handling
 
-extension RouteMapViewController {
+extension RouteMapViewController_v2 {
     fileprivate func subscribeToKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(RouteMapViewController.keyboardWillShow(notification:)), name:UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(RouteMapViewController.keyboardWillHide(notification:)), name:UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(RouteMapViewController_v2.keyboardWillShow(notification:)), name:UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(RouteMapViewController_v2.keyboardWillHide(notification:)), name:UIResponder.keyboardWillHideNotification, object: nil)
     }
     fileprivate func unsubscribeFromKeyboardNotifications() {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -866,8 +866,8 @@ internal extension UIView.AnimationOptions {
     }
 }
 protocol RouteMapViewControllerDelegate: NavigationMapViewDelegate, VisualInstructionDelegate {
-    func mapViewControllerDidDismiss(_ mapViewController: RouteMapViewController, byCanceling canceled: Bool)
-    func mapViewControllerShouldAnnotateSpokenInstructions(_ routeMapViewController: RouteMapViewController) -> Bool
+    func mapViewControllerDidDismiss(_ mapViewController: RouteMapViewController_v2, byCanceling canceled: Bool)
+    func mapViewControllerShouldAnnotateSpokenInstructions(_ routeMapViewController: RouteMapViewController_v2) -> Bool
 
     /**
      Called to allow the delegate to customize the contents of the road name label that is displayed towards the bottom of the map view.
@@ -878,7 +878,7 @@ protocol RouteMapViewControllerDelegate: NavigationMapViewDelegate, VisualInstru
      - parameter location: The user’s current location.
      - return: The road name to display in the label, or the empty string to hide the label, or nil to query the map’s vector tiles for the road name.
      */
-    func mapViewController(_ mapViewController: RouteMapViewController, roadNameAt location: CLLocation) -> String?
+    func mapViewController(_ mapViewController: RouteMapViewController_v2, roadNameAt location: CLLocation) -> String?
     
-    func mapViewController(_ mapViewController: RouteMapViewController, didCenterOn location: CLLocation)
+    func mapViewController(_ mapViewController: RouteMapViewController_v2, didCenterOn location: CLLocation)
 }
