@@ -131,7 +131,7 @@ public class NavigationDirections: Directions {
                                                                navigatorVersion: "",
                                                                skuTokenSource: skuTokenProvider)
             let params = RouterParams(tilesPath: tilesURL.path, inMemoryTileCache: nil, mapMatchingSpatialCache: nil, threadsCount: nil, endpointConfig: tileEndpointConfig)
-            let tileCount = self.navigator.configureRouter(for: params)
+            _ = self.navigator.configureRouter(for: params)
             DispatchQueue.main.async {
                 completionHandler(tilesURL)
             }
